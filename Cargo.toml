@@ -1,0 +1,13 @@
+[package]
+name = "storykeep"
+description = "Version control tailored for writers"
+version = "0.0.1"
+readme = "README.md"
+authors = ["Dídac Sementé Fernández <didac.semente@gmail.com>"]
+license = "MIT"
+edition = "2018"
+categories = ["command-line-utilities", "text-processing"]
+keywords = ["vcs", "writing", "cli"]
+
+[dependencies]
+clap = "~2.33.0"

@@ -4,6 +4,11 @@ use std::path::Path;
 
 mod constants;
 
+/// Tries to create a `.keep` folder in the current working directory.
+///
+/// The method will first check if there already exists a `.keep` folder
+/// in the current path down to the root, if not it will try to create
+/// the folder.
 pub fn initialize_keep() -> Result<String, String> {
     match create_keep_at_wd() {
         // TODO: Properly handle non UTF-8 paths
@@ -12,7 +17,8 @@ pub fn initialize_keep() -> Result<String, String> {
     }
 }
 
-fn can_initialize_keep_at_wd() -> bool {
+/// Checks if a keep can be created at the current working directory.
+pub fn can_initialize_keep_at_wd() -> bool {
     if let Ok(current_path) = get_wd() {
         can_initialize_keep_at(current_path.as_path())
     } else {
@@ -23,8 +29,20 @@ fn can_initialize_keep_at_wd() -> bool {
 fn can_initialize_keep_at(path: &Path) -> bool {
     let mut path = path.to_path_buf();
     if path.is_dir() {
-        path.push(constants::KEEP_FOLDER);
-        !path.is_dir()
+        loop {
+            path.push(constants::KEEP_FOLDER);
+
+            if path.is_dir() {
+                return false;
+            }
+
+            path.pop();
+
+            if path.pop() {
+                // We've reached the root path with no keep found.
+                return true;
+            }
+        }
     } else {
         false
     }

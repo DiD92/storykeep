@@ -1,5 +1,9 @@
+#[doc(hidden)]
 mod cli;
 
+mod hashing;
+
+#[doc(hidden)]
 fn main() {
     let matches = cli::get_cli_app().get_matches();
 

@@ -5,7 +5,7 @@ mod commands;
 pub mod constants;
 
 pub fn get_cli_app<'a, 'b>() -> App<'a, 'b> {
-    App::new("storybook")
+    App::new(env!("CARGO_PKG_NAME"))
         .version(env!("CARGO_PKG_VERSION"))
         .author("Dídac S. <didac.semente@gmail.com>")
         .about("Version control tailored for writers")

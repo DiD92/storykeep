@@ -9,6 +9,18 @@ fn main() {
         (cli::constants::INIT_SUBCMD, Some(sub_matches)) => {
             process_init_subcommand(sub_matches.is_present(cli::constants::INIT_CHECK_ONLY));
         }
+        (cli::constants::STATE_SUBCMD, Some(sub_matches)) => {
+            // TODO
+            println!("State subcommand!");
+        }
+        (cli::constants::TRACK_SUBCMD, Some(sub_matches)) => {
+            // TODO
+            println!("Track subcommand!");
+        }
+        (cli::constants::COMPARE_SUBCMD, Some(sub_matches)) => {
+            // TODO
+            println!("Compare subcommand!");
+        }
         (_, Some(&_)) => {}
         (_, None) => {
             panic!("No valid subcommand parsed!");

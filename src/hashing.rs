@@ -2,7 +2,7 @@ use std::hash::Hasher;
 use twox_hash::XxHash64;
 
 /// Computes the hexadecimal representation of the `bytes` slice.
-/// 
+///
 /// The code used the `twox_hash::XxHash64` hasher to compute the
 /// hash and the formats the result to a `String` representation.
 pub fn compute_hash_from_bytes(bytes: &[u8]) -> String {
@@ -14,7 +14,7 @@ pub fn compute_hash_from_bytes(bytes: &[u8]) -> String {
 }
 
 /// Computes the hexadecimal representation of the `text` slice.
-/// 
+///
 /// The function calls `compute_hash_from_bytes` with the parameter
 /// converted to a byte slice.
 pub fn compute_hash_from_text(text: &str) -> String {

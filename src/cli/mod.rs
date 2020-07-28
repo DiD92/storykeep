@@ -1,4 +1,4 @@
-use clap::{App, AppSettings};
+use clap::{App, AppSettings, Arg};
 
 mod commands;
 
@@ -11,4 +11,10 @@ pub fn get_cli_app<'a, 'b>() -> App<'a, 'b> {
         .about("Version control tailored for writers")
         .setting(AppSettings::SubcommandRequiredElseHelp)
         .subcommands(commands::get_commands())
+        .arg(
+            Arg::with_name("dry-run")
+                .long("dry-run")
+                .multiple(false)
+                .help("Run the commands but do not perform any changes"),
+        )
 }

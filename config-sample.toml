@@ -1,0 +1,14 @@
+# This is a mere sample file with all the possible configuration options possible for given keep.
+# This file will reside inside the .keep folder, there's also a global file used as a basis when 
+# initializing new keeps.
+
+[author]
+name = "John Doe"
+email = "thisisanemail@email.com"
+pen-name = "Tom Roe"
+
+[formatting]
+# Changing this settings with an already existing keep
+# can lead to unexpected behavior!
+paragraph-separation-length = 2
+chapter-indicator-character = "#"

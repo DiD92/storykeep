@@ -1,6 +1,8 @@
 #[doc(hidden)]
 mod cli;
 
+mod config;
+
 extern crate storykeep as sk_api;
 
 #[doc(hidden)]

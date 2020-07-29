@@ -2,6 +2,7 @@ use serde::{Deserialize, Serialize};
 use std::fs::read_to_string;
 use std::path::Path;
 use toml::{de::Error, from_str as toml_from_str};
+use crate::{fs::get_keep_base_dir, constants::KEEP_CONFIG_FILE};
 
 #[cfg_attr(debug_assertions, derive(Debug, std::cmp::PartialEq))]
 #[derive(Serialize, Deserialize)]
@@ -45,6 +46,20 @@ pub fn extract_config_from_str<T: AsRef<str>>(config_str: T) -> Option<Config> {
             None
         }
     }
+}
+
+pub fn get_keep_config() -> Option<Config> {
+    if let Some(path) = get_keep_base_dir() {
+        let mut config_file_path = path.into_path_buf();
+
+        config_file_path.push(KEEP_CONFIG_FILE);
+
+        if config_file_path.is_file() {
+            return extract_config_from_file(config_file_path.as_ref());
+        }
+    }
+
+    None
 }
 
 #[cfg(test)]

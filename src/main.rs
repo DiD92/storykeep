@@ -1,8 +1,6 @@
 #[doc(hidden)]
 mod cli;
 
-mod config;
-
 extern crate storykeep as sk_api;
 
 #[doc(hidden)]
@@ -34,7 +32,7 @@ fn main() {
 
 fn process_init_subcommand(check_only: bool) {
     if check_only {
-        if sk_api::can_initialize_keep_at_wd() {
+        if sk_api::can_initialize_keep() {
             println!("Keep can be created at current working directory!");
         } else {
             println!("Keep already present or invalid directory!");

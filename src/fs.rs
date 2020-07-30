@@ -1,7 +1,7 @@
 use crate::constants::{APP_INFO, KEEP_FOLDER};
 use directories::ProjectDirs;
 use std::env::current_dir;
-use std::fs::create_dir;
+use std::fs::{create_dir, create_dir_all};
 use std::path::Path;
 
 pub fn get_current_dir() -> Option<Box<Path>> {
@@ -40,10 +40,7 @@ pub fn create_keep_folder_at(path: &Path) -> Result<Box<Path>, String> {
         keep_path.push(KEEP_FOLDER);
 
         match create_dir(keep_path.as_path()) {
-            Ok(_) => {
-                keep_path.pop();
-                Ok(keep_path.into_boxed_path())
-            }
+            Ok(_) => Ok(keep_path.into_boxed_path()),
             Err(reason) => Err(reason.to_string()),
         }
     } else {
@@ -82,5 +79,21 @@ pub fn get_app_config_dir() -> Option<Box<Path>> {
         Some(proj_dirs.config_dir().to_path_buf().into_boxed_path())
     } else {
         None
+    }
+}
+
+pub fn initialize_app_config_dir() -> Option<Box<Path>> {
+    let config_dir = get_app_config_dir();
+
+    match config_dir {
+        Some(dir) if dir.exists() => Some(dir),
+        Some(dir) if !dir.exists() => match create_dir_all(dir.as_ref()) {
+            Ok(_) => Some(dir),
+            Err(_) => {
+                // TODO: Log error
+                return None;
+            }
+        },
+        _ => None,
     }
 }

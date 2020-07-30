@@ -1,11 +1,13 @@
 use std::env::current_dir;
+use std::fs::write as write_to_file;
 use std::path::Path;
+use toml::to_string as toml_to_string;
 
 mod config;
 mod constants;
 mod fs;
 
-pub use config::{get_app_config, get_keep_config};
+pub use config::{get_app_config, get_app_config_or_create, get_keep_config};
 
 /// Tries to create a `.keep` folder in the current working directory.
 ///
@@ -21,7 +23,21 @@ pub fn initialize_keep() -> Result<String, String> {
 
 pub fn initialize_keep_at(path: &Path) -> Result<String, String> {
     match fs::create_keep_folder_at(path) {
-        Ok(path) => Ok(format!("Keep created at {}", path.to_str().unwrap())),
+        Ok(keep_path) => {
+            let keep_config = keep_path.to_path_buf().join(constants::KEEP_CONFIG_FILE);
+
+            if let Some(app_config) = get_app_config() {
+                match toml_to_string(&app_config.global_keep_config) {
+                    Ok(content) => match write_to_file(keep_config.into_boxed_path(), &content) {
+                        Ok(_) => Ok(format!("Keep created at {}", path.to_str().unwrap())),
+                        Err(err) => Err(format!("{}", err)),
+                    },
+                    Err(_) => Err("Error initializing keep configuration!".into()),
+                }
+            } else {
+                return Err("Error initializing keep configuration!".into());
+            }
+        }
         Err(message) => Err(message),
     }
 }

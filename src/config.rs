@@ -1,15 +1,16 @@
 use crate::{
     constants::{APP_CONFIG_FILE, KEEP_CONFIG_FILE},
-    fs::{get_app_config_dir, get_keep_base_dir},
+    fs::{get_app_config_dir, get_keep_base_dir, initialize_app_config_dir},
 };
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
-use std::fs::read_to_string;
+use std::fs::{read_to_string, write as write_to_file};
 use std::path::Path;
-use toml::from_str as toml_from_str;
+use toml::{from_str as toml_from_str, to_string as toml_to_string};
 
 #[cfg_attr(debug_assertions, derive(Debug, std::cmp::PartialEq))]
 #[derive(Serialize, Deserialize)]
 pub struct AppConfig {
+    #[serde(rename = "global-keep-config")]
     pub global_keep_config: KeepConfig,
 }
 
@@ -23,10 +24,10 @@ pub struct KeepConfig {
 #[cfg_attr(debug_assertions, derive(Debug, std::cmp::PartialEq))]
 #[derive(Serialize, Deserialize)]
 pub struct Author {
-    pub name: String,
-    pub email: String,
+    pub name: Option<String>,
+    pub email: Option<String>,
     #[serde(rename = "pen-name")]
-    pub pen_name: String,
+    pub pen_name: Option<String>,
 }
 
 #[cfg_attr(debug_assertions, derive(Debug, std::cmp::PartialEq))]
@@ -47,9 +48,9 @@ impl ConfigKind for KeepConfig {}
 impl Author {
     pub fn default() -> Self {
         Author {
-            name: "".into(),
-            email: "".into(),
-            pen_name: "".into(),
+            name: None,
+            email: None,
+            pen_name: None,
         }
     }
 }
@@ -86,7 +87,7 @@ where
 {
     match read_to_string(config_file_path) {
         Ok(file_content) => extract_config_from_str(&file_content),
-        Err(error) => None,
+        Err(_error) => None,
     }
 }
 
@@ -105,9 +106,7 @@ where
 
 pub fn get_keep_config() -> Option<KeepConfig> {
     if let Some(path) = get_keep_base_dir() {
-        let mut config_file_path = path.into_path_buf();
-
-        config_file_path.push(KEEP_CONFIG_FILE);
+        let config_file_path = path.into_path_buf().join(KEEP_CONFIG_FILE);
 
         if config_file_path.is_file() {
             return extract_config_from_file(config_file_path.as_ref());
@@ -119,9 +118,7 @@ pub fn get_keep_config() -> Option<KeepConfig> {
 
 pub fn get_app_config() -> Option<AppConfig> {
     if let Some(path) = get_app_config_dir() {
-        let mut config_file_path = path.into_path_buf();
-
-        config_file_path.push(APP_CONFIG_FILE);
+        let config_file_path = path.into_path_buf().join(APP_CONFIG_FILE);
 
         if config_file_path.is_file() {
             return extract_config_from_file(config_file_path.as_ref());
@@ -129,6 +126,28 @@ pub fn get_app_config() -> Option<AppConfig> {
     }
 
     None
+}
+
+pub fn get_app_config_or_create() -> Option<AppConfig> {
+    if let Some(config) = get_app_config() {
+        return Some(config);
+    }
+
+    let default_config = AppConfig::default();
+
+    if let Some(path) = initialize_app_config_dir() {
+        let config_file_path = path.into_path_buf().join(APP_CONFIG_FILE);
+
+        if !config_file_path.exists() {
+            if let Ok(result) = toml_to_string(&default_config) {
+                if let Err(err) = write_to_file(config_file_path, result) {
+                    println!("{}", err);
+                }
+            }
+        }
+    }
+
+    Some(default_config)
 }
 
 #[cfg(test)]
@@ -151,9 +170,9 @@ mod tests {
 
         let target_config = KeepConfig {
             author: Author {
-                name: "John".into(),
-                email: "anemail@emailer.com".into(),
-                pen_name: "Winston".into(),
+                name: Some("John".into()),
+                email: Some("anemail@emailer.com".into()),
+                pen_name: Some("Winston".into()),
             },
             formatting: Formatting {
                 paragraph_separation_length: 2,

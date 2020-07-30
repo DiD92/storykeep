@@ -7,27 +7,27 @@ extern crate storykeep as sk_api;
 fn main() {
     let matches = cli::get_cli_app().get_matches();
 
-    let keep_config = sk_api::get_keep_config();
+    let _keep_config = sk_api::get_keep_config();
 
-    let app_config = sk_api::get_app_config();
+    let _app_config = sk_api::get_app_config_or_create();
 
     match matches.subcommand() {
         (cli::constants::INIT_SUBCMD, Some(sub_matches)) => {
             process_init_subcommand(sub_matches.is_present(cli::constants::INIT_CHECK_ONLY));
         }
-        (cli::constants::STATE_SUBCMD, Some(sub_matches)) => {
+        (cli::constants::STATE_SUBCMD, Some(_sub_matches)) => {
             // TODO
             println!("State subcommand!");
         }
-        (cli::constants::TRACK_SUBCMD, Some(sub_matches)) => {
+        (cli::constants::TRACK_SUBCMD, Some(_sub_matches)) => {
             // TODO
             println!("Track subcommand!");
         }
-        (cli::constants::COMPARE_SUBCMD, Some(sub_matches)) => {
+        (cli::constants::COMPARE_SUBCMD, Some(_sub_matches)) => {
             // TODO
             println!("Compare subcommand!");
         }
-        (cli::constants::CONFIG_SUBCMD, Some(sub_matches)) => {
+        (cli::constants::CONFIG_SUBCMD, Some(_sub_matches)) => {
             // TODO
             println!("Config subcommand!");
         }
@@ -48,7 +48,7 @@ fn process_init_subcommand(check_only: bool) {
     } else {
         match sk_api::initialize_keep() {
             Ok(message) => println!("{}", message),
-            Err(message) => eprintln!("{}", message),
+            Err(message) => println!("{}", message),
         }
     }
 }

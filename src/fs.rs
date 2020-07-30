@@ -1,5 +1,5 @@
 use crate::constants::KEEP_FOLDER;
-use std::env::current_dir;
+use std::env::{current_dir, current_exe};
 use std::fs::create_dir;
 use std::path::Path;
 
@@ -69,6 +69,16 @@ pub fn get_keep_base_dir() -> Option<Box<Path>> {
                 return None;
             }
         }
+    } else {
+        None
+    }
+}
+
+pub fn get_app_base_dir() -> Option<Box<Path>> {
+    if let Ok(mut path) = current_exe() {
+        path.pop();
+
+        Some(path.into_boxed_path())
     } else {
         None
     }

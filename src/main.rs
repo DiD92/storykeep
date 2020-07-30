@@ -9,6 +9,8 @@ fn main() {
 
     let keep_config = sk_api::get_keep_config();
 
+    let app_config = sk_api::get_app_config();
+
     match matches.subcommand() {
         (cli::constants::INIT_SUBCMD, Some(sub_matches)) => {
             process_init_subcommand(sub_matches.is_present(cli::constants::INIT_CHECK_ONLY));

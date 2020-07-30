@@ -5,6 +5,8 @@ mod config;
 mod constants;
 mod fs;
 
+pub use config::get_keep_config;
+
 /// Tries to create a `.keep` folder in the current working directory.
 ///
 /// The method will first check if there already exists a `.keep` folder

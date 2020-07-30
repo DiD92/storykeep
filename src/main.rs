@@ -7,6 +7,8 @@ extern crate storykeep as sk_api;
 fn main() {
     let matches = cli::get_cli_app().get_matches();
 
+    let keep_config = sk_api::get_keep_config();
+
     match matches.subcommand() {
         (cli::constants::INIT_SUBCMD, Some(sub_matches)) => {
             process_init_subcommand(sub_matches.is_present(cli::constants::INIT_CHECK_ONLY));

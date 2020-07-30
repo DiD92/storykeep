@@ -1,15 +1,27 @@
+use crate::{constants::KEEP_CONFIG_FILE, fs::get_keep_base_dir};
 use serde::{Deserialize, Serialize};
 use std::fs::read_to_string;
 use std::path::Path;
 use toml::{de::Error, from_str as toml_from_str};
-use crate::{fs::get_keep_base_dir, constants::KEEP_CONFIG_FILE};
+
+trait ConfigKind {}
 
 #[cfg_attr(debug_assertions, derive(Debug, std::cmp::PartialEq))]
 #[derive(Serialize, Deserialize)]
-pub struct Config {
+pub struct AppConfig {
+    pub global_keep_config: KeepConfig
+}
+
+impl ConfigKind for AppConfig {}
+
+#[cfg_attr(debug_assertions, derive(Debug, std::cmp::PartialEq))]
+#[derive(Serialize, Deserialize)]
+pub struct KeepConfig {
     pub author: Author,
     pub formatting: Formatting,
 }
+
+impl ConfigKind for KeepConfig {}
 
 #[cfg_attr(debug_assertions, derive(Debug, std::cmp::PartialEq))]
 #[derive(Serialize, Deserialize)]
@@ -29,15 +41,23 @@ pub struct Formatting {
     pub chapter_indicator_character: String,
 }
 
-pub fn extract_config_from_file(config_file_path: &Path) -> Option<Config> {
+/*impl KeepConfig {
+    pub fn default(&self) -> Self {
+        KeepConfig {}
+    }
+}*/
+
+fn extract_config_from_file<'de, C>(config_file_path: &Path) -> Option<C> 
+where C: ConfigKind + Deserialize<'de> {
     match read_to_string(config_file_path) {
         Ok(file_content) => extract_config_from_str(file_content),
         Err(error) => None,
     }
 }
 
-pub fn extract_config_from_str<T: AsRef<str>>(config_str: T) -> Option<Config> {
-    let config: Result<Config, Error> = toml_from_str(config_str.as_ref());
+fn extract_config_from_str<'de, T, C>(config_str: T) -> Option<C> 
+where T: AsRef<str> + 'de, C: ConfigKind + Deserialize<'de> {
+    let config: Result<C, Error> = toml_from_str(config_str.as_ref());
 
     match config {
         Ok(config) => Some(config),
@@ -48,7 +68,7 @@ pub fn extract_config_from_str<T: AsRef<str>>(config_str: T) -> Option<Config> {
     }
 }
 
-pub fn get_keep_config() -> Option<Config> {
+pub fn get_keep_config() -> Option<KeepConfig> {
     if let Some(path) = get_keep_base_dir() {
         let mut config_file_path = path.into_path_buf();
 
@@ -59,6 +79,10 @@ pub fn get_keep_config() -> Option<Config> {
         }
     }
 
+    None
+}
+
+pub fn get_app_config() -> Option<AppConfig> {
     None
 }
 
@@ -80,7 +104,7 @@ mod tests {
         chapter-indicator-character = "#"
         "##;
 
-        let target_config = Config {
+        let target_config = KeepConfig {
             author: Author {
                 name: "John".to_string(),
                 email: "anemail@emailer.com".to_string(),

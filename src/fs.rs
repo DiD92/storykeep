@@ -1,9 +1,10 @@
-use crate::constants::KEEP_FOLDER;
-use std::env::{current_dir, current_exe};
+use crate::constants::{APP_INFO, KEEP_FOLDER};
+use directories::ProjectDirs;
+use std::env::current_dir;
 use std::fs::create_dir;
 use std::path::Path;
 
-pub fn get_current_dir<'a>() -> Option<Box<Path>> {
+pub fn get_current_dir() -> Option<Box<Path>> {
     if let Ok(current_path) = current_dir() {
         Some(current_path.into_boxed_path())
     } else {
@@ -74,11 +75,11 @@ pub fn get_keep_base_dir() -> Option<Box<Path>> {
     }
 }
 
-pub fn get_app_base_dir() -> Option<Box<Path>> {
-    if let Ok(mut path) = current_exe() {
-        path.pop();
+pub fn get_app_config_dir() -> Option<Box<Path>> {
+    let (qual, org, app) = APP_INFO;
 
-        Some(path.into_boxed_path())
+    if let Some(proj_dirs) = ProjectDirs::from(qual, org, app) {
+        Some(proj_dirs.config_dir().to_path_buf().into_boxed_path())
     } else {
         None
     }

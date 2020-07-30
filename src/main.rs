@@ -27,6 +27,10 @@ fn main() {
             // TODO
             println!("Compare subcommand!");
         }
+        (cli::constants::CONFIG_SUBCMD, Some(sub_matches)) => {
+            // TODO
+            println!("Config subcommand!");
+        }
         (_, Some(&_)) => {}
         (_, None) => {
             panic!("No valid subcommand parsed!");

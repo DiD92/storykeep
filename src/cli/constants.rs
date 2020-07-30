@@ -10,3 +10,7 @@ pub const TRACK_SUBCMD_ALIAS: &str = "trk";
 
 pub const COMPARE_SUBCMD: &str = "compare";
 pub const COMPARE_SUBCMD_ALIAS: &str = "cmp";
+
+pub const CONFIG_SUBCMD: &str = "config";
+pub const CONFIG_SUBCMD_ALIAS: &str = "cfg";
+pub const CONFIG_FILE_LOCATION: &str = "file_location";

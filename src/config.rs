@@ -1,6 +1,6 @@
 use crate::{
     constants::{APP_CONFIG_FILE, KEEP_CONFIG_FILE},
-    fs::{get_app_base_dir, get_keep_base_dir},
+    fs::{get_app_config_dir, get_keep_base_dir},
 };
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
 use std::fs::read_to_string;
@@ -118,7 +118,7 @@ pub fn get_keep_config() -> Option<KeepConfig> {
 }
 
 pub fn get_app_config() -> Option<AppConfig> {
-    if let Some(path) = get_app_base_dir() {
+    if let Some(path) = get_app_config_dir() {
         let mut config_file_path = path.into_path_buf();
 
         config_file_path.push(APP_CONFIG_FILE);
@@ -151,13 +151,13 @@ mod tests {
 
         let target_config = KeepConfig {
             author: Author {
-                name: "John".to_string(),
-                email: "anemail@emailer.com".to_string(),
-                pen_name: "Winston".to_string(),
+                name: "John".into(),
+                email: "anemail@emailer.com".into(),
+                pen_name: "Winston".into(),
             },
             formatting: Formatting {
                 paragraph_separation_length: 2,
-                chapter_indicator_character: "#".to_string(),
+                chapter_indicator_character: "#".into(),
             },
         };
 

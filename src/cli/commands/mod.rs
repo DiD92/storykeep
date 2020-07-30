@@ -1,4 +1,5 @@
 mod compare_subcmd;
+mod config_subcmd;
 mod init_subcmd;
 mod state_subcmd;
 mod track_subcmd;
@@ -10,6 +11,7 @@ pub fn get_commands<'a, 'b>() -> Vec<clap::App<'a, 'b>> {
     command_vector.push(state_subcmd::get_state_subcommand());
     command_vector.push(track_subcmd::get_track_subcommand());
     command_vector.push(compare_subcmd::get_compare_subcommand());
+    command_vector.push(config_subcmd::get_config_subcommand());
 
     command_vector
 }

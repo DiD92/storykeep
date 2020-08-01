@@ -89,9 +89,10 @@ pub fn initialize_app_config_dir() -> Option<Box<Path>> {
         Some(dir) if dir.exists() => Some(dir),
         Some(dir) if !dir.exists() => match create_dir_all(dir.as_ref()) {
             Ok(_) => Some(dir),
-            Err(_) => {
+            Err(err) => {
                 // TODO: Log error
-                return None;
+                eprintln!("Error {}", err);
+                None
             }
         },
         _ => None,

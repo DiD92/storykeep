@@ -1,3 +1,5 @@
+use clap::ArgMatches;
+
 #[doc(hidden)]
 mod cli;
 
@@ -6,10 +8,6 @@ extern crate storykeep as sk_api;
 #[doc(hidden)]
 fn main() {
     let matches = cli::get_cli_app().get_matches();
-
-    let _keep_config = sk_api::get_keep_config();
-
-    let _app_config = sk_api::get_app_config_or_create();
 
     match matches.subcommand() {
         (cli::constants::INIT_SUBCMD, Some(sub_matches)) => {
@@ -27,9 +25,11 @@ fn main() {
             // TODO
             println!("Compare subcommand!");
         }
-        (cli::constants::CONFIG_SUBCMD, Some(_sub_matches)) => {
+        (cli::constants::CONFIG_SUBCMD, Some(sub_matches)) => {
+            let file_location = sub_matches.value_of(cli::constants::CONFIG_FILE_LOCATION);
+            let config_action = sub_matches.subcommand();
             // TODO
-            println!("Config subcommand!");
+            process_config_subcommand(file_location, config_action);
         }
         (_, Some(&_)) => {}
         (_, None) => {
@@ -50,5 +50,29 @@ fn process_init_subcommand(check_only: bool) {
             Ok(message) => println!("{}", message),
             Err(message) => println!("{}", message),
         }
+    }
+}
+
+fn process_config_subcommand(file_location: Option<&str>, subcommand: (&str, Option<&ArgMatches>)) {
+    match subcommand {
+        (cli::constants::CONFIG_LIST_SUBCMD, _) => match file_location {
+            Some(cli::constants::CONFIG_FILE_LOCATION_AUTO) => match sk_api::get_keep_config() {
+                Some(config) => println!("{}", config),
+                None => match sk_api::get_app_config() {
+                    Some(config) => println!("{}", config),
+                    None => eprint!("No valid configuration file found!"),
+                },
+            },
+            Some(cli::constants::CONFIG_FILE_LOCATION_APP) => match sk_api::get_app_config() {
+                Some(config) => println!("{}", config),
+                None => eprint!("No valid app configuration file found!"),
+            },
+            Some(cli::constants::CONFIG_FILE_LOCATION_KEEP) => match sk_api::get_keep_config() {
+                Some(config) => println!("{}", config),
+                None => eprintln!("No valid keep configuration file found!"),
+            },
+            _ => {}
+        },
+        _ => {}
     }
 }

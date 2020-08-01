@@ -35,7 +35,7 @@ pub fn initialize_keep_at(path: &Path) -> Result<String, String> {
                     Err(_) => Err("Error initializing keep configuration!".into()),
                 }
             } else {
-                return Err("Error initializing keep configuration!".into());
+                Err("Error initializing keep configuration!".into())
             }
         }
         Err(message) => Err(message),

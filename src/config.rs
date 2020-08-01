@@ -4,7 +4,10 @@ use crate::{
 };
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
 use std::fs::{read_to_string, write as write_to_file};
-use std::path::Path;
+use std::{
+    fmt::{Display, Formatter, Result},
+    path::Path,
+};
 use toml::{from_str as toml_from_str, to_string as toml_to_string};
 
 #[cfg_attr(debug_assertions, derive(Debug, std::cmp::PartialEq))]
@@ -55,12 +58,48 @@ impl Author {
     }
 }
 
+impl Display for Author {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result {
+        if let Some(name) = &self.name {
+            writeln!(f, "author.name = \"{}\"", name.as_str())?;
+        }
+
+        if let Some(email) = &self.email {
+            writeln!(f, "author.email = \"{}\"", email.as_str())?;
+        }
+
+        if let Some(pen_name) = &self.pen_name {
+            writeln!(f, "author.pen-name = \"{}\"", pen_name.as_str())?;
+        }
+
+        write!(f, "")
+    }
+}
+
 impl Formatting {
     pub fn default() -> Self {
         Formatting {
             paragraph_separation_length: 2,
             chapter_indicator_character: "#".into(),
         }
+    }
+}
+
+impl Display for Formatting {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result {
+        writeln!(
+            f,
+            "formatting.paragraph-separation-length = {}",
+            &self.paragraph_separation_length
+        )?;
+
+        writeln!(
+            f,
+            "formatting.chapter-indicator-character = \"{}\"",
+            &self.chapter_indicator_character
+        )?;
+
+        write!(f, "")
     }
 }
 
@@ -73,11 +112,31 @@ impl KeepConfig {
     }
 }
 
+impl Display for KeepConfig {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result {
+        writeln!(f, "Keep config:")?;
+        write!(f, "{}", self.author)?;
+        writeln!(f)?;
+        write!(f, "{}", self.formatting)?;
+        write!(f, "")
+    }
+}
+
 impl AppConfig {
     pub fn default() -> Self {
         AppConfig {
             global_keep_config: KeepConfig::default(),
         }
+    }
+}
+
+impl Display for AppConfig {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result {
+        writeln!(f, "App config:")?;
+        write!(f, "{}", self.global_keep_config.author)?;
+        writeln!(f)?;
+        write!(f, "{}", self.global_keep_config.formatting)?;
+        write!(f, "")
     }
 }
 

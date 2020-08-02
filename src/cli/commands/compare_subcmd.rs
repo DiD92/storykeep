@@ -6,4 +6,5 @@ pub fn get_compare_subcommand<'a, 'b>() -> App<'a, 'b> {
         .visible_alias(COMPARE_SUBCMD_ALIAS)
         .setting(AppSettings::DisableVersion)
         .about("Compares different revisions of the keep")
+        .display_order(4)
 }

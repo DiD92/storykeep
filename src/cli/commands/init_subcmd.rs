@@ -12,4 +12,5 @@ pub fn get_init_subcommand<'a, 'b>() -> App<'a, 'b> {
                 .long("check")
                 .short("c"),
         )
+        .display_order(1)
 }

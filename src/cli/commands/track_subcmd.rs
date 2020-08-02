@@ -6,4 +6,5 @@ pub fn get_track_subcommand<'a, 'b>() -> App<'a, 'b> {
         .visible_alias(TRACK_SUBCMD_ALIAS)
         .setting(AppSettings::DisableVersion)
         .about("Adds a file to the keep's tracker")
+        .display_order(3)
 }

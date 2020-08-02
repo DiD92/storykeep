@@ -6,4 +6,5 @@ pub fn get_state_subcommand<'a, 'b>() -> App<'a, 'b> {
         .visible_alias(STATE_SUBCMD_ALIAS)
         .setting(AppSettings::DisableVersion)
         .about("Show various reports about the keep's state")
+        .display_order(2)
 }

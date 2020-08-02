@@ -7,7 +7,9 @@ mod config;
 mod constants;
 mod fs;
 
-pub use config::{get_app_config, get_app_config_or_create, get_keep_config};
+pub use config::{
+    get_app_config, get_app_config_or_create, get_keep_config, AppConfig, ConfigKind, KeepConfig,
+};
 
 /// Tries to create a `.keep` folder in the current working directory.
 ///

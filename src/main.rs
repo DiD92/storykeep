@@ -28,7 +28,6 @@ fn main() {
         (cli::constants::CONFIG_SUBCMD, Some(sub_matches)) => {
             let file_location = sub_matches.value_of(cli::constants::CONFIG_FILE_LOCATION);
             let config_action = sub_matches.subcommand();
-            // TODO
             process_config_subcommand(file_location, config_action);
         }
         (_, Some(&_)) => {}
@@ -54,25 +53,120 @@ fn process_init_subcommand(check_only: bool) {
 }
 
 fn process_config_subcommand(file_location: Option<&str>, subcommand: (&str, Option<&ArgMatches>)) {
-    match subcommand {
-        (cli::constants::CONFIG_LIST_SUBCMD, _) => match file_location {
-            Some(cli::constants::CONFIG_FILE_LOCATION_AUTO) => match sk_api::get_keep_config() {
-                Some(config) => println!("{}", config),
-                None => match sk_api::get_app_config() {
-                    Some(config) => println!("{}", config),
-                    None => eprint!("No valid configuration file found!"),
-                },
-            },
-            Some(cli::constants::CONFIG_FILE_LOCATION_APP) => match sk_api::get_app_config() {
-                Some(config) => println!("{}", config),
-                None => eprint!("No valid app configuration file found!"),
-            },
-            Some(cli::constants::CONFIG_FILE_LOCATION_KEEP) => match sk_api::get_keep_config() {
-                Some(config) => println!("{}", config),
-                None => eprintln!("No valid keep configuration file found!"),
-            },
-            _ => {}
-        },
+    use sk_api::ConfigKind;
+
+    match file_location {
+        Some(cli::constants::CONFIG_FILE_LOCATION_AUTO) => {
+            if let Some(keep_config) = sk_api::get_keep_config() {
+                match subcommand {
+                    (cli::constants::CONFIG_LIST_SUBCMD, _) => print!("{}", keep_config),
+                    (cli::constants::CONFIG_GET_SUBCMD, Some(sub_matches)) => {
+                        if let Some(config_key) =
+                            sub_matches.value_of(cli::constants::CONFIG_SUBCMD_KEY_ARG)
+                        {
+                            match keep_config.get_value(config_key) {
+                                Some(value) => {
+                                    if sub_matches
+                                        .is_present(cli::constants::CONFIG_GET_SIMPLE_FLAG)
+                                    {
+                                        println!("{}", value);
+                                    } else {
+                                        println!("{} => {}", config_key, value);
+                                    }
+                                }
+                                None => eprintln!("Key {} not found in configuration!", config_key),
+                            }
+                        }
+                    }
+                    (cli::constants::CONFIG_SET_SUBCMD, sub_matches) => {}
+                    _ => {}
+                }
+            } else if let Some(app_config) = sk_api::get_app_config() {
+                match subcommand {
+                    (cli::constants::CONFIG_LIST_SUBCMD, _) => print!("{}", app_config),
+                    (cli::constants::CONFIG_GET_SUBCMD, Some(sub_matches)) => {
+                        if let Some(config_key) =
+                            sub_matches.value_of(cli::constants::CONFIG_SUBCMD_KEY_ARG)
+                        {
+                            match app_config.get_value(config_key) {
+                                Some(value) => {
+                                    if sub_matches
+                                        .is_present(cli::constants::CONFIG_GET_SIMPLE_FLAG)
+                                    {
+                                        println!("{}", value);
+                                    } else {
+                                        println!("{} => {}", config_key, value);
+                                    }
+                                }
+                                None => eprintln!("Key {} not found in configuration!", config_key),
+                            }
+                        }
+                    }
+                    (cli::constants::CONFIG_SET_SUBCMD, sub_matches) => {}
+                    _ => {}
+                }
+            } else {
+                eprintln!("No valid configuration file found!")
+            }
+        }
+        Some(cli::constants::CONFIG_FILE_LOCATION_APP) => {
+            if let Some(config) = sk_api::get_app_config() {
+                match subcommand {
+                    (cli::constants::CONFIG_LIST_SUBCMD, _) => print!("{}", config),
+                    (cli::constants::CONFIG_GET_SUBCMD, Some(sub_matches)) => {
+                        if let Some(config_key) =
+                            sub_matches.value_of(cli::constants::CONFIG_SUBCMD_KEY_ARG)
+                        {
+                            match config.get_value(config_key) {
+                                Some(value) => {
+                                    if sub_matches
+                                        .is_present(cli::constants::CONFIG_GET_SIMPLE_FLAG)
+                                    {
+                                        println!("{}", value);
+                                    } else {
+                                        println!("{} => {}", config_key, value);
+                                    }
+                                }
+                                None => eprintln!("Key {} not found in configuration!", config_key),
+                            }
+                        }
+                    }
+                    (cli::constants::CONFIG_SET_SUBCMD, sub_matches) => {}
+                    _ => {}
+                }
+            } else {
+                eprintln!("No valid app configuration file found!");
+            }
+        }
+        Some(cli::constants::CONFIG_FILE_LOCATION_KEEP) => {
+            if let Some(config) = sk_api::get_keep_config() {
+                match subcommand {
+                    (cli::constants::CONFIG_LIST_SUBCMD, _) => print!("{}", config),
+                    (cli::constants::CONFIG_GET_SUBCMD, Some(sub_matches)) => {
+                        if let Some(config_key) =
+                            sub_matches.value_of(cli::constants::CONFIG_SUBCMD_KEY_ARG)
+                        {
+                            match config.get_value(config_key) {
+                                Some(value) => {
+                                    if sub_matches
+                                        .is_present(cli::constants::CONFIG_GET_SIMPLE_FLAG)
+                                    {
+                                        println!("{}", value);
+                                    } else {
+                                        println!("{} => {}", config_key, value);
+                                    }
+                                }
+                                None => eprintln!("Key {} not found in configuration!", config_key),
+                            }
+                        }
+                    }
+                    (cli::constants::CONFIG_SET_SUBCMD, sub_matches) => {}
+                    _ => {}
+                }
+            } else {
+                eprintln!("No valid keep configuration file found!");
+            }
+        }
         _ => {}
     }
 }

@@ -42,11 +42,69 @@ pub struct Formatting {
     pub chapter_indicator_character: String,
 }
 
-trait ConfigKind {}
+pub trait ConfigKind {
+    fn get_value(&self, key: &str) -> Option<&dyn Display>;
 
-impl ConfigKind for AppConfig {}
+    fn set_value(&self, key: &str, value: &str) -> Option<&dyn Display>;
+}
 
-impl ConfigKind for KeepConfig {}
+impl ConfigKind for AppConfig {
+    fn get_value(&self, key: &str) -> Option<&dyn Display> {
+        let key_components = key.split('.').collect::<Vec<&str>>();
+
+        if key_components.len() != 3 {
+            return None;
+        }
+
+        match key_components[0] {
+            "global-keep-config" => self
+                .global_keep_config
+                .get_value(&key_components[1..=2].join(".")),
+            _ => None,
+        }
+    }
+
+    fn set_value(&self, key: &str, value: &str) -> Option<&dyn Display> {
+        todo!()
+    }
+}
+
+fn to_displayable<'a>(enter: Option<&'a String>) -> Option<&'a dyn Display> {
+    // TODO: There has to be a better way to do this
+    match enter {
+        Some(item) => Some(item),
+        None => None,
+    }
+}
+
+impl ConfigKind for KeepConfig {
+    fn get_value(&self, key: &str) -> Option<&dyn Display> {
+        let key_components = key.split('.').collect::<Vec<&str>>();
+
+        if key_components.len() != 2 {
+            return None;
+        }
+
+        match key_components[0] {
+            "author" => match key_components[1] {
+                "name" => to_displayable(self.author.name.as_ref()),
+                "email" => to_displayable(self.author.email.as_ref()),
+                "pen-name" => to_displayable(self.author.pen_name.as_ref()),
+                _ => None,
+            },
+            "formatting" => match key_components[1] {
+                "paragraph-separation-length" => Some(&self.formatting.paragraph_separation_length),
+                "chapter-indicator-character" => Some(&self.formatting.chapter_indicator_character),
+                _ => None,
+            },
+            _ => None,
+        }
+    }
+
+    fn set_value(&self, key: &str, value: &str) -> Option<&dyn Display> {
+        todo!()
+    }
+}
 
 impl Author {
     pub fn default() -> Self {

@@ -57,7 +57,7 @@ fn process_config_subcommand(file_location: Option<&str>, subcommand: (&str, Opt
 
     match file_location {
         Some(cli::constants::CONFIG_FILE_LOCATION_AUTO) => {
-            if let Some(keep_config) = sk_api::get_keep_config() {
+            if let Some(mut keep_config) = sk_api::get_keep_config() {
                 match subcommand {
                     (cli::constants::CONFIG_LIST_SUBCMD, _) => print!("{}", keep_config),
                     (cli::constants::CONFIG_GET_SUBCMD, Some(sub_matches)) => {
@@ -78,10 +78,26 @@ fn process_config_subcommand(file_location: Option<&str>, subcommand: (&str, Opt
                             }
                         }
                     }
-                    (cli::constants::CONFIG_SET_SUBCMD, sub_matches) => {}
+                    (cli::constants::CONFIG_SET_SUBCMD, Some(sub_matches)) => {
+                        let config_key = sub_matches
+                            .value_of(cli::constants::CONFIG_SUBCMD_KEY_ARG)
+                            .unwrap();
+
+                        let config_value = sub_matches
+                            .value_of(cli::constants::CONFIG_SUBCMD_VALUE_ARG)
+                            .unwrap();
+
+                        match keep_config.set_value(config_key, config_value) {
+                            Some(result) => {
+                                todo!("Save config");
+                                println!("{} -> {}", config_value, result)
+                            },
+                            None => println!("Nothin changed!"),
+                        }
+                    }
                     _ => {}
                 }
-            } else if let Some(app_config) = sk_api::get_app_config() {
+            } else if let Some(mut app_config) = sk_api::get_app_config() {
                 match subcommand {
                     (cli::constants::CONFIG_LIST_SUBCMD, _) => print!("{}", app_config),
                     (cli::constants::CONFIG_GET_SUBCMD, Some(sub_matches)) => {
@@ -102,7 +118,23 @@ fn process_config_subcommand(file_location: Option<&str>, subcommand: (&str, Opt
                             }
                         }
                     }
-                    (cli::constants::CONFIG_SET_SUBCMD, sub_matches) => {}
+                    (cli::constants::CONFIG_SET_SUBCMD, Some(sub_matches)) => {
+                        let config_key = sub_matches
+                            .value_of(cli::constants::CONFIG_SUBCMD_KEY_ARG)
+                            .unwrap();
+
+                        let config_value = sub_matches
+                            .value_of(cli::constants::CONFIG_SUBCMD_VALUE_ARG)
+                            .unwrap();
+
+                        match app_config.set_value(config_key, config_value) {
+                            Some(result) => {
+                                todo!("Save config");
+                                println!("{} -> {}", config_value, result)
+                            },
+                            None => println!("Nothin changed!"),
+                        }
+                    }
                     _ => {}
                 }
             } else {
@@ -110,7 +142,7 @@ fn process_config_subcommand(file_location: Option<&str>, subcommand: (&str, Opt
             }
         }
         Some(cli::constants::CONFIG_FILE_LOCATION_APP) => {
-            if let Some(config) = sk_api::get_app_config() {
+            if let Some(mut config) = sk_api::get_app_config() {
                 match subcommand {
                     (cli::constants::CONFIG_LIST_SUBCMD, _) => print!("{}", config),
                     (cli::constants::CONFIG_GET_SUBCMD, Some(sub_matches)) => {
@@ -131,7 +163,23 @@ fn process_config_subcommand(file_location: Option<&str>, subcommand: (&str, Opt
                             }
                         }
                     }
-                    (cli::constants::CONFIG_SET_SUBCMD, sub_matches) => {}
+                    (cli::constants::CONFIG_SET_SUBCMD, Some(sub_matches)) => {
+                        let config_key = sub_matches
+                            .value_of(cli::constants::CONFIG_SUBCMD_KEY_ARG)
+                            .unwrap();
+
+                        let config_value = sub_matches
+                            .value_of(cli::constants::CONFIG_SUBCMD_VALUE_ARG)
+                            .unwrap();
+
+                        match config.set_value(config_key, config_value) {
+                            Some(result) => {
+                                todo!("Save config");
+                                println!("{} -> {}", config_value, result)
+                            },
+                            None => println!("Nothin changed!"),
+                        }
+                    }
                     _ => {}
                 }
             } else {
@@ -139,7 +187,7 @@ fn process_config_subcommand(file_location: Option<&str>, subcommand: (&str, Opt
             }
         }
         Some(cli::constants::CONFIG_FILE_LOCATION_KEEP) => {
-            if let Some(config) = sk_api::get_keep_config() {
+            if let Some(mut config) = sk_api::get_keep_config() {
                 match subcommand {
                     (cli::constants::CONFIG_LIST_SUBCMD, _) => print!("{}", config),
                     (cli::constants::CONFIG_GET_SUBCMD, Some(sub_matches)) => {
@@ -160,7 +208,23 @@ fn process_config_subcommand(file_location: Option<&str>, subcommand: (&str, Opt
                             }
                         }
                     }
-                    (cli::constants::CONFIG_SET_SUBCMD, sub_matches) => {}
+                    (cli::constants::CONFIG_SET_SUBCMD, Some(sub_matches)) => {
+                        let config_key = sub_matches
+                            .value_of(cli::constants::CONFIG_SUBCMD_KEY_ARG)
+                            .unwrap();
+
+                        let config_value = sub_matches
+                            .value_of(cli::constants::CONFIG_SUBCMD_VALUE_ARG)
+                            .unwrap();
+
+                        match config.set_value(config_key, config_value) {
+                            Some(result) => {
+                                todo!("Save config");
+                                println!("{} -> {}", config_value, result)
+                            },
+                            None => println!("Nothin changed!"),
+                        }
+                    }
                     _ => {}
                 }
             } else {

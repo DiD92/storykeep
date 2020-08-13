@@ -45,12 +45,14 @@ pub struct Formatting {
 pub trait ConfigKind {
     fn get_value(&self, key: &str) -> Option<&dyn Display>;
 
-    fn set_value(&self, key: &str, value: &str) -> Option<&dyn Display>;
+    fn set_value(&mut self, key: &str, value: &str) -> Option<&dyn Display>;
 }
 
 impl ConfigKind for AppConfig {
     fn get_value(&self, key: &str) -> Option<&dyn Display> {
-        let key_components = key.split('.').collect::<Vec<&str>>();
+        let separator: &str = ".";
+
+        let key_components = key.split(separator).collect::<Vec<&str>>();
 
         if key_components.len() != 3 {
             return None;
@@ -59,13 +61,26 @@ impl ConfigKind for AppConfig {
         match key_components[0] {
             "global-keep-config" => self
                 .global_keep_config
-                .get_value(&key_components[1..=2].join(".")),
+                .get_value(&key_components[1..=2].join(separator)),
             _ => None,
         }
     }
 
-    fn set_value(&self, key: &str, value: &str) -> Option<&dyn Display> {
-        todo!()
+    fn set_value(&mut self, key: &str, value: &str) -> Option<&dyn Display> {
+        let separator: &str = ".";
+
+        let key_components = key.split(separator).collect::<Vec<&str>>();
+
+        if key_components.len() != 3 {
+            return None;
+        }
+
+        match key_components[0] {
+            "global-keep-config" => self
+                .global_keep_config
+                .set_value(&key_components[1..=2].join(separator), value),
+            _ => None,
+        }
     }
 }
 
@@ -101,8 +116,49 @@ impl ConfigKind for KeepConfig {
         }
     }
 
-    fn set_value(&self, key: &str, value: &str) -> Option<&dyn Display> {
-        todo!()
+    fn set_value(&mut self, key: &str, value: &str) -> Option<&dyn Display> {
+        let key_components = key.split('.').collect::<Vec<&str>>();
+
+        if key_components.len() != 2 {
+            return None;
+        }
+
+        match key_components[0] {
+            "author" => match key_components[1] {
+                "name" => {
+                    self.author.name = Some(value.to_string());
+                    to_displayable(self.author.name.as_ref())
+                }
+                "email" => {
+                    self.author.email = Some(value.to_string());
+                    to_displayable(self.author.email.as_ref())
+                }
+                "pen-name" => {
+                    self.author.pen_name = Some(value.to_string());
+                    to_displayable(self.author.pen_name.as_ref())
+                }
+                _ => None,
+            },
+            "formatting" => match key_components[1] {
+                "paragraph-separation-length" => match value.parse::<u8>() {
+                    Ok(parsed) => {
+                        self.formatting.paragraph_separation_length = parsed;
+                        Some(&self.formatting.paragraph_separation_length)
+                    }
+                    Err(_) => None,
+                },
+                "chapter-indicator-character" => {
+                    if value.len() == 1 {
+                        self.formatting.chapter_indicator_character = value.to_string();
+                        return Some(&self.formatting.chapter_indicator_character);
+                    }
+
+                    None
+                }
+                _ => None,
+            },
+            _ => None,
+        }
     }
 }
 

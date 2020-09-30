@@ -91,7 +91,7 @@ fn process_config_subcommand(file_location: Option<&str>, subcommand: (&str, Opt
                             Some(result) => {
                                 todo!("Save config");
                                 println!("{} -> {}", config_value, result)
-                            },
+                            }
                             None => println!("Nothin changed!"),
                         }
                     }
@@ -131,7 +131,7 @@ fn process_config_subcommand(file_location: Option<&str>, subcommand: (&str, Opt
                             Some(result) => {
                                 todo!("Save config");
                                 println!("{} -> {}", config_value, result)
-                            },
+                            }
                             None => println!("Nothin changed!"),
                         }
                     }
@@ -176,7 +176,7 @@ fn process_config_subcommand(file_location: Option<&str>, subcommand: (&str, Opt
                             Some(result) => {
                                 todo!("Save config");
                                 println!("{} -> {}", config_value, result)
-                            },
+                            }
                             None => println!("Nothin changed!"),
                         }
                     }
@@ -221,7 +221,7 @@ fn process_config_subcommand(file_location: Option<&str>, subcommand: (&str, Opt
                             Some(result) => {
                                 todo!("Save config");
                                 println!("{} -> {}", config_value, result)
-                            },
+                            }
                             None => println!("Nothin changed!"),
                         }
                     }

@@ -5,10 +5,98 @@ use crate::{
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
 use std::fs::{read_to_string, write as write_to_file};
 use std::{
-    fmt::{Display, Formatter, Result},
+    cell::{Ref, RefCell},
+    fmt::{Display, Formatter, Result as FmtResult},
     path::Path,
+    result::Result,
 };
 use toml::{from_str as toml_from_str, to_string as toml_to_string};
+
+pub struct ConfigStore<C: ConfigKind + DeserializeOwned> {
+    config: RefCell<C>,
+}
+
+impl<C: ConfigKind + DeserializeOwned> ConfigStore<C> {
+    pub fn load_from_str(buff: &str) -> Option<Self> {
+        match toml_from_str::<C>(buff) {
+            Ok(parsed_cfg) => {
+                let store = ConfigStore {
+                    config: RefCell::new(parsed_cfg),
+                };
+                Some(store)
+            }
+            Err(error) => {
+                println!("{}", error);
+                None
+            }
+        }
+    }
+
+    pub fn save_at_path(path: &Path) -> Result<(), String> {
+        todo!()
+    }
+
+    pub fn get_config(&self) -> Ref<C> {
+        self.config.borrow()
+    }
+
+    pub fn edit_config(&self, config_key: &str, config_value: &str) -> Result<String, String> {
+        let mut editable_config = self.config.borrow_mut();
+
+        let result = editable_config.set_value(config_key, config_value);
+
+        match result {
+            Some(result) => Ok(result.to_string()),
+            None => Err(String::from("No changes made!")),
+        }
+    }
+}
+
+impl ConfigStore<KeepConfig> {
+    pub fn load() -> Option<Self> {
+        if let Some(dir) = get_keep_base_dir() {
+            let keep_config_path = dir.to_path_buf().join(KEEP_CONFIG_FILE);
+
+            let config: Option<KeepConfig> = extract_config_from_file(&keep_config_path);
+
+            match config {
+                Some(keep_config) => {
+                    return Some(ConfigStore{config: RefCell::new(keep_config)})
+                },
+                None => None,
+            }
+        } else {
+            return None;
+        }
+    }
+
+    pub fn save(&self) -> Result<(), String> {
+        todo!()
+    }
+}
+
+impl ConfigStore<AppConfig> {
+    pub fn load() -> Option<Self> {
+        if let Some(dir) = get_app_config_dir() {
+            let app_config_path = dir.to_path_buf().join(APP_CONFIG_FILE);
+
+            let config: Option<AppConfig> = extract_config_from_file(&app_config_path);
+
+            match config {
+                Some(app_config) => {
+                    return Some(ConfigStore{config: RefCell::new(app_config)})
+                },
+                None => None,
+            }
+        } else {
+            return None;
+        }
+    }
+
+    pub fn save(&self) -> Result<(), String> {
+        todo!()
+    }
+}
 
 #[cfg_attr(debug_assertions, derive(Debug, std::cmp::PartialEq))]
 #[derive(Serialize, Deserialize)]
@@ -173,7 +261,7 @@ impl Author {
 }
 
 impl Display for Author {
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result {
+    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         if let Some(name) = &self.name {
             writeln!(f, "author.name = \"{}\"", name.as_str())?;
         }
@@ -200,7 +288,7 @@ impl Formatting {
 }
 
 impl Display for Formatting {
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result {
+    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         writeln!(
             f,
             "formatting.paragraph-separation-length = {}",
@@ -227,7 +315,7 @@ impl KeepConfig {
 }
 
 impl Display for KeepConfig {
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result {
+    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         writeln!(f, "Keep config:")?;
         write!(f, "{}", self.author)?;
         writeln!(f)?;
@@ -245,7 +333,7 @@ impl AppConfig {
 }
 
 impl Display for AppConfig {
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result {
+    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         writeln!(f, "App config:")?;
         write!(f, "{}", self.global_keep_config.author)?;
         writeln!(f)?;
